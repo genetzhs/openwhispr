@@ -1,0 +1,50 @@
+# Builds only the Android .apk (debug-keystore signed, installable by sideloading).
+# Run it from Actions → "Android APK" → Run workflow, or push a tag like `apk-v1`.
+# Download the apk from the run's "Artifacts" section (tags also get a GitHub release).
+name: Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["apk-v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: openwhispr-mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: openwhispr-mobile/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      - run: npm ci
+      - name: Expo prebuild
+        run: npx expo prebuild --platform android --no-install --clean
+      - name: Build release .apk
+        working-directory: openwhispr-mobile/android
+        run: ./gradlew assembleRelease --no-daemon
+      - name: Rename apk
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/release/*.apk "out/OpenWhispr-${GITHUB_REF_NAME//\//-}-${GITHUB_RUN_NUMBER}.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: openwhispr-apk
+          path: openwhispr-mobile/out/*.apk
+      - if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          prerelease: true
+          files: openwhispr-mobile/out/*.apk
