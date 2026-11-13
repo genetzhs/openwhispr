@@ -48,6 +48,8 @@ jobs:
           GRADLE
       - name: Build release .apk
         working-directory: openwhispr-mobile/android
+        env:
+          SENTRY_DISABLE_AUTO_UPLOAD: "true"
         run: ./gradlew assembleRelease --no-daemon
       - name: Rename apk
         run: |
