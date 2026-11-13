@@ -98,7 +98,8 @@ jobs:
           path: openwhispr-mobile/out/*.apk
 
   release:
-    if: startsWith(github.ref, 'refs/tags/')
+    # always(): publish whatever platforms built, so one failure doesn't hold back the rest.
+    if: always() && startsWith(github.ref, 'refs/tags/')
     needs: [linux, mac, android]
     runs-on: ubuntu-latest
     steps:
@@ -109,4 +110,5 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           prerelease: true
+          fail_on_unmatched_files: false
           files: artifacts/*
