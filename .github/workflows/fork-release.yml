@@ -99,6 +99,11 @@ jobs:
             }
           }
           GRADLE
+      - name: Resolve AppsFlyer manifest conflict
+        run: |
+          M=android/app/src/main/AndroidManifest.xml
+          grep -q 'xmlns:tools' $M || sed -i 's#<manifest #<manifest xmlns:tools="http://schemas.android.com/tools" #' $M
+          sed -i 's#<application #<application tools:replace="android:dataExtractionRules,android:fullBackupContent" #' $M
       - name: Build release .apk
         working-directory: openwhispr-mobile/android
         env:
