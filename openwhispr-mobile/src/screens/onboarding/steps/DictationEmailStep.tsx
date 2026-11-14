@@ -1,8 +1,8 @@
+import { iosColor } from '@/config/colors';
 import { useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
 import {
   Image,
   Keyboard,
-  PlatformColor,
   ScrollView,
   StyleSheet,
   TextInput,
@@ -226,7 +226,7 @@ function AppIcon({
 const styles = StyleSheet.create({
   emailInput: {
     minHeight: 140,
-    color: PlatformColor('label') as unknown as string,
+    color: iosColor('label'),
     fontFamily: AppFont.regular,
     fontSize: 16,
     fontWeight: '400',

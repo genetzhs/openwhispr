@@ -1,7 +1,7 @@
+import { iosColor } from '@/config/colors';
 import { useMemo } from 'react';
 import {
   View,
-  PlatformColor,
   ScrollView,
   StyleSheet,
   type StyleProp,
@@ -16,9 +16,9 @@ interface MarkdownRendererProps {
   selectable?: boolean;
 }
 
-const labelColor = PlatformColor('label') as unknown as string;
-const secondaryColor = PlatformColor('secondaryLabel') as unknown as string;
-const tertiaryBg = PlatformColor('tertiarySystemBackground') as unknown as string;
+const labelColor = iosColor('label');
+const secondaryColor = iosColor('secondaryLabel');
+const tertiaryBg = iosColor('tertiarySystemBackground');
 
 type InlineSegment = { text: string; bold?: boolean; italic?: boolean; code?: boolean };
 

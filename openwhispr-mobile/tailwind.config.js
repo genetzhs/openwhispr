@@ -1,9 +1,12 @@
-const { platformColor } = require('nativewind/theme');
+const { platformColor, platformSelect } = require('nativewind/theme');
 
 const BRAND = '#2F5BEA';
 
+// iOS system colors exist only on iOS; Android's PlatformColor treats every
+// argument as a resource path and crashes on unknown names, so other
+// platforms get the literal fallback.
 const ios = (iosName, androidFallback, web = androidFallback) =>
-  platformColor(iosName, androidFallback, web);
+  platformSelect({ ios: platformColor(iosName), android: androidFallback, default: web });
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
