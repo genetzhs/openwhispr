@@ -51,6 +51,13 @@ jobs:
       matrix:
         arch: [arm64, x64]
     runs-on: macos-latest
+    env:
+      # Cross-compile the Swift and C sidecar binaries for the requested arch;
+      # scripts/lib/build-macos-swift-binary.js and the fast-paste/text-monitor
+      # builders all read TARGET_ARCH. Without this the macos-latest runner's
+      # host arch (arm64) ships inside the x64 DMG and the Globe hotkey fails
+      # with "binary is arm64 but this Mac requires x64".
+      TARGET_ARCH: ${{ matrix.arch }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -61,6 +68,12 @@ jobs:
       - run: npm run prebuild:mac
       - name: Build .dmg (unsigned)
         run: npm run build:renderer && npx electron-builder --mac dmg --${{ matrix.arch }} --publish never -c.mac.identity=null -c.mac.notarize=false
+      - name: Rename dmg for arch
+        run: |
+          for f in dist/*.dmg; do
+            base=$(basename "$f" .dmg)
+            mv "$f" "dist/${base}-${{ matrix.arch }}.dmg"
+          done
       - uses: actions/upload-artifact@v4
         with:
           name: mac-${{ matrix.arch }}
