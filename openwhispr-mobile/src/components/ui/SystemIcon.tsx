@@ -2,7 +2,7 @@ import React from 'react';
 import { PlatformColor, type ColorValue } from 'react-native';
 import { Image } from 'expo-image';
 import * as LucideIcons from 'lucide-react-native';
-import { BRAND } from '@/config/colors';
+import { BRAND, iosColor } from '@/config/colors';
 
 const IS_IOS = process.env.EXPO_OS === 'ios';
 
@@ -34,7 +34,14 @@ type SystemIconProps = {
 
 function resolveColor(color?: SystemIconColor): ColorValue | undefined {
   if (!color) return undefined;
-  if (color in TOKEN_COLORS) return PlatformColor(TOKEN_COLORS[color as keyof typeof TOKEN_COLORS]);
+  if (color in TOKEN_COLORS) {
+    const token = TOKEN_COLORS[color as keyof typeof TOKEN_COLORS];
+    // react-native-svg can't resolve iOS PlatformColor values on Android: the
+    // native SVG renderer throws "None of the paths in the `resource_paths`
+    // array resolved to a color resource" when a Lucide icon's stroke gets
+    // one, so route Android through iosColor()'s literal fallback.
+    return IS_IOS ? PlatformColor(token) : iosColor(token);
+  }
   if (color in LITERAL_COLORS) return LITERAL_COLORS[color as keyof typeof LITERAL_COLORS];
   return color;
 }
